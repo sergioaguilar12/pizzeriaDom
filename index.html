@@ -1,0 +1,446 @@
+<!-DOCTYPE HTML-->
+<html>
+<head>
+    <title>Cliente Domicilio</title> 
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+<link rel="stylesheet" href="css/jquery.mobile.theme-1.4.5.min.css" type="text/css"  />
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" type="text/css" />
+<script src="cordova.js"></script>
+<script type="text/javascript" src="phonegap.js"></script>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-ui.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/jquery-2.2.0.min.js" ></script>
+<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js" ></script>
+
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css">
+<!--coordenadas-->
+<script type="text/javascript">
+            opciones={maximumage:500000, enableHighAccuracy:true, timeout:5000};
+           
+            document.addEventListener("deviceready",function(){
+                //alert("Funciona");
+                $("#btnObtCoords").tap(function(){
+                   // alert("Funciona");
+                    if(navigator.geolocation){
+                        navigator.geolocation.getCurrentPosition(exito, falla, opciones);
+                        function exito(ubicacion){
+                            $("#txtLatitud").val(ubicacion.coords.latitude);
+                            $("#txtLongitud").val(ubicacion.coords.longitude);
+                           // $("#datos").html("<p> Latitude: "+ubicacion.coords.latitude+"</p><p>Longitud: "+ubicacion.coords.longitude+"</p>");
+                        }
+                        function falla(error){
+                            navigator.notification("Error al obtener cordenadas "+error);
+                        }
+                    }else{
+                            navigator.notification("su dispositivo no tiene sopoirte de geolocation");
+                        }
+                    });
+
+            }, false);
+</script>
+<!--Foto-->
+<script type="text/javascript" charset="utf-8">
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady(){
+        $("#btnTomarFoto").tap(function (){//Capturar fotografia
+            navigator.device.capture.captureImage(function(mediaFiles){
+		//alert("listo");
+                path = mediaFiles[0].fullPath;
+		$('#regFoto').append('<br><img id="imagen" src="'+path+'" width="100%" />').attr('rel',path);
+	    },function(error){
+		navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+	    },{limit:1});
+         });
+     }
+     
+     function uploadPhoto(foto) {
+	//alert("si entro: "+foto);
+	var options = new FileUploadOptions();
+	options.fileKey="file";
+	options.fileName=$("#Nombre").val();
+	options.mimeType="image/jpeg";
+        //alert("si entro a upload: "+options.fileName);
+	var params = {};
+	params.value1 = "test";
+	params.value2 = "param";
+	options.params = params;
+
+	var ft = new FileTransfer();
+	ft.upload(foto,"http://iscmoviles.890m.com/subirArchivo.php",function(r){
+		navigator.notification.confirm("El archivo: "+r.response,null, "Notificacion");
+	}, function(err){
+		navigator.notification.alert("Error: "+err.code+" detalle: "+err.response,null, "Error de Envío");
+	}, options);
+}
+        </script>
+<!--guardar opcion elegida-->
+<script >
+    $(document).on("ready", function(){
+        //alert("probando jquery");
+        
+        $("#cbOpcioness").change(function(){
+            var seleccion= $("#cbOpcioness option:selected").text();
+            $("#txt0").val(seleccion);
+            //alert("Cambio de opccion"+seleccion);
+        });
+        $("#cbOpciones").change(function(){
+            //alert("Cambio de opccion");
+           // var seleccion= $("#cbOpciones option:selected").val();
+            //$("#txt1").val(seleccion);
+            //alert("Cambio de opccion"+seleccion);
+            var seleccion= $("#cbOpciones option:selected").text();
+            $("#txt1").val(seleccion);
+            //alert("Cambio de opccion"+seleccion);
+        });
+        $("#cbOpcionesT").change(function(){
+            var seleccion= $("#cbOpcionesT option:selected").text();
+            $("#txt2").val(seleccion);
+            //alert("Cambio de opccion"+seleccion);
+        });
+        $("#cbOpcionesB").change(function(){
+            var seleccion= $("#cbOpcionesB option:selected").text();
+            $("#txt3").val(seleccion);
+            //alert("Cambio de opccion"+seleccion);
+        });
+        $('#sumar').on('click', function(){
+            resultado = 0;
+            $('select').each(function(){
+                resultado += ($(this).val())*1
+            });
+            $('#cajaresult').val(resultado);
+        });
+    });
+</script>
+<!--Guardar Datos-->
+<script type="text/javascript">
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        // Nombre, Direccion, TipoPago, Longitud, Latitud, Telefono, Foto, Pizza, Tamaño, Bebida, RFC, Costo
+        $("#btnEnviar").tap(function env(){
+        // alert("ruta: "+$("#imagen").attr("src"));  
+             if($("#imagen").attr("src")==""){
+		alert("Antes de registrar el servicio debe tomar una fotografía del mismo ");
+	      } //else{
+                    //alert("Empesamos con las Alertas jijijij"); 
+                    var nom=$("#txtnombre").val();
+                    var dire=$("#txtdire").val();
+                    var pga=$("#txt0").val();                    
+                    var lotud=$("#txtLongitud").val();
+                    var latud=$("#txtLatitud").val();
+                    var tel=$("#txttel").val();
+                    var img=$("#nomImagen").val();
+                    var pza=$("#txt1").val();
+                    var tno=$("#txt2").val();
+                    var bda=$("#txt3").val();
+                    var rfc=$("#txtrfc").val();
+                    var sma=$("#cajaresult").val();
+                    
+                    if(nom==""){
+                        $("#mensaje1").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje1").fadeOut();
+                    }
+                    if(tel==""){
+                        $("#mensaje2").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje2").fadeOut();
+                    }
+                    if(dire==""){
+                        $("#mensaje3").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje3").fadeOut();
+                    }
+                   if(img==""){
+                        $("#mensaje4").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje4").fadeOut();
+                    }
+                    if(latud==""){
+                        $("#mensaje5").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje5").fadeOut();
+                    }
+                    if(pga==""){
+                        $("#mensaje6").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje6").fadeOut();
+                    }
+                    if(pza==""){
+                        $("#mensaje7").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje7").fadeOut();
+                    }
+                    if(tno==""){
+                        $("#mensaje8").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje8").fadeOut();
+                    }
+                    if(bda==""){
+                        $("#mensaje9").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje9").fadeOut();
+                    }
+                    if(sma==""){
+                        $("#mensaje10").fadeIn("slow");
+                        return false;
+                    }else {
+                        $("#mensaje10").fadeOut();
+                        $.ajax({
+                            type:"POST",
+                            url:"guardarDom.php",
+                            data:"nomb="+nom+"&dcion="+dire+"&paga="+pga+"&otud="+lotud+"&atud="+latud+"&num="+tel+"&pzza="+pza+"&tam="+tno+"&beb="+bda+"&rf="+rfc+"&sum="+sma,
+                            success: exitoso
+                        });
+                        function exitoso(datos){
+                            alert("Respuesta: "+datos);
+                        }
+                        uploadPhoto($("#imagen").attr("src"));
+                    }
+                    location.reload()
+                });
+    }
+</script>
+<!--Funcion de reloj-->
+<script type="text/javascript">
+    //variables
+            var fecha;
+            var grados;
+            var segundos;
+            var minutos;
+            var horas;
+            var x;
+            //funcion principal
+            x = $(document);
+            x.ready(reloj);
+            //Funcion del reloj
+            function reloj(){
+                x=$("#digital");
+                fecha = new Date();
+                segundos = fecha.getSeconds();
+                minutos = fecha.getMinutes();
+                horas = fecha.getHours();
+                /*if(segundos == 2){
+                    segundos = "0"+segundos;
+                }*/
+                x.html(horas+":"+minutos+":"+segundos);
+                //meto mis funciones para quese actualizen al segundo
+                seg();
+                min();
+                hour();
+            }
+            //Funciones de cada aguja
+            function seg(){
+                x=$("#segundero");
+                grados = segundos * 6;
+                x.css("-webkit-transform","rotate("+grados+"deg)");
+            }
+            function min(){
+                x=$("#minutero");
+                grados = minutos * 6;
+                x.css("-webkit-transform","rotate("+grados+"deg)");
+            }
+            function hour(){
+                x=$("#hora");
+                grados = ((horas * 5 + minutos/12)*6);
+                x.css("-webkit-transform","rotate("+grados+"deg)");
+            }
+            //Definimos el intervalo
+            setInterval(reloj,1000);
+</script>
+<!--Estilos definidos-->
+<style type="text/css">
+#encabezado{
+text-align:center;
+font-size: 14px;
+color:red;
+font-weight:bold;
+}
+#pie{
+
+text-align:center;
+font-size:8px;
+color:green;
+font-weight:bold;
+}
+#global {
+	height: 500px;
+	width: 470px;
+	border: 1px solid #ddd;
+	background: #f1f1f1;
+	overflow-y: scroll;
+}
+.errores{
+      -webkit-boxshadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      -o-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      background: red;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      display: none;
+      font-size: 14px;
+      margin-top: -50px;
+      margin-left: 180px;
+      padding: 10px;
+      position: absolute;
+}
+img{
+    position: absolute;
+}
+//img#segundero, img#minutero, img#hora{
+  // -webkit-transition: -webkit-transform 1s;
+//}
+</style>
+<!--paginas-->
+</head>
+<body>
+    <!--Menu Cliente Domicilio-->
+    <div data-role="page" id="principal" data-theme="a">
+	<div data-role="header">
+		<h1>Cliente a domicilio</h1>
+	</div>
+        <div id="global">
+            <div data-role="content">
+<!-- div's de mensajes de error individual -->                
+        <div id="mensaje1" class="errores">Escriba su nombre</div>
+        <div id="mensaje2" class="errores">Digite su Núm. Tel.</div>
+        <div id="mensaje3" class="errores">Escriba su dirección</div>        
+        <div id="mensaje4" class="errores">Presiones Btn tomar foto</div>
+        <div id="mensaje5" class="errores">Presiones Btn obtener cordenadas</div>
+       <!-- <div id="mensaje6" class="errores">Seleccione forma de pago</div>   -->
+        <div id="mensaje7" class="errores">Seleccione su Pizza</div>
+        <div id="mensaje8" class="errores">Seleccione el tamaño deseando</div>
+        <div id="mensaje9" class="errores">Seleccione su bevida deseanda</div>
+        <div id="mensaje10" class="errores">Presione el boton sumar</div>
+        
+                
+                
+                
+            <div>
+                <input type="text" value="" placeholder="Escriba su nombre" id="txtnombre" required title="Ejemplo: Nombre Apellidom Apellidop"/>
+                <input type="tel" value="" placeholder="Digite su Núm. de Telefono" id="txttel" required pattern="[1-9]{10}[0-9]{3}[0-9]{4}" title="formato: xxxxxxxxxx"/>
+                <input type="text" value="" placeholder="Escriba su RFC" id="txtrfc" pattern="[A-Za-z]{4}[0-9]{6}[A-Za-z0-9]{3}" title="formato: ABCD123456DE3"/>
+                <input type="text" value="" placeholder="Escriba su direccion" id="txtdire" required/>
+            </div> 
+                
+                
+                <div data-role="content">                   
+                    <input type="button" id="btnObtCoords" value="obtener cordenadas"/>
+                    <!--div id="datos"></div-->                        
+                </div>
+<!-- para la foto -->                
+                <div data-role="content">
+                    <input type="button" id="btnTomarFoto" value="Tomar Foto" >
+                    <div id="regFoto"></div>
+                    <!--input type="button" id="btnSubirArchivo" value="Subir Arcchivo"-->
+                    <input type="text" id="nomImagen" placeholder="Direccion de Foto" readonly="readonly" required>
+                </div>
+                
+                <div id="cbOpcioness">
+                    <select>
+                        <option value="0"> Forma de Pago</option>
+                        <option value="0"> Efectivo</option>
+                        <option value="0"> Targeta</option>                        
+                    </select>
+                </div>
+                <div id="cbOpciones">
+                    <select>
+                        <option value="0"> Seleccione Pizza</option>
+                        <option value="0"> Queso y pepperoni</option>
+                        <option value="2"> Jamón y palmitos</option>
+                        <option value="3"> Margherita</option>
+                        <option value="4"> Hawaiana</option>
+                        <option value="5"> Pollo</option>
+                        <option value="6"> Jamón y panceta</option>
+                        <option value="7"> Napolitana</option>
+                        <option value="8"> Pizza 4 quesos</option>
+                        <option value="9"> Huevo y tocino</option>
+                        <option value="0"> Ninguno</option>
+                    </select>
+                </div>
+                <div id="cbOpcionesT">
+                    <select>
+                        <option value="0"> Seleccione Tamaño</option>
+                        <option value="100"> Grande</option>
+                        <option value="70"> Mediana</option>
+                        <option value="40"> Chica</option>
+                        <option value="11"> Revanada</option>
+                    </select>
+                </div>
+                <div id="cbOpcionesB">
+                    <select>
+                        <option value="0"> Seleccione Su bebida</option>
+                        <option value="30"> Coca cola</option>
+                        <option value="20"> Agua mineral</option>
+                        <option value="18"> Cerveza Sol</option>
+                        <option value="17"> Cerveza Indio</option>
+                        <option value="25"> Pepsi</option>
+                        <option value="28"> Tinto de verano</option>
+                        <option value="23"> Fanta Naranja</option>
+                        <option value="19"> Kas</option>
+                        <option value="29"> Zumo de naranja</option>
+                        <option value="13"> Trina</option>
+                        <option value="35"> Red bull</option>
+                        <option value="40"> Bebida isotónica</option>
+                        <option value="0"> Ninguno</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="text" id="txtLatitud" placeholder="Latitud" readonly="readonly"/>
+                    <input type="text" id="txtLongitud" placeholder="Longitud" readonly="readonly"/>
+                    <input type="text" id="txt0" placeholder="Forma de Pago" readonly="readonly"/>
+                    <input type="text" id="txt1" placeholder="Pizza" readonly="readonly">
+                    <input type="text" id="txt2" placeholder="Tamaño" readonly="readonly">
+                    <input type="text" id="txt3" placeholder="Bevida" readonly="readonly">
+                </div>
+                <div>  . 
+                    <input type="button" name="miboton4" value="sumar" id="sumar" />
+                    <input type="text" name="cajaresult" id="cajaresult" value="" placeholder="Presione el boton sumar" readonly="readonly" />
+                </div>
+                <div>
+                    <!--input type="button" value="Ordenar" id="btnEnviar" href="#reloj"/-->
+                    <a href="#reloj" data-role="button" id="btnEnviar" data-transition="slideup">Ordenar</a>
+                </div>
+            </div>
+        </div>
+            
+         
+	<div data-role="footer">
+            <a href="https://www.facebook.com/y08defensa" class="ui-btn">Facebook</a>
+            <a href="https://twitter.com/andas10" class="ui-btn">Twitter</a>
+	</div>
+</div>
+    <!--Pagina de reloj-->
+    <div data-role="page" id="reloj" data-theme="a">
+	<div data-role="header">
+		<h1>Cliente a domicilio</h1>
+	</div>
+        <div data-role="content">
+            <div id="digital"></div>
+        <div id="analogo">
+            <img id="base" src="imagenes/basee.png"/>
+            <img id="segundero" src="imagenes/segundero.png"/>
+            <img id="minutero" src="imagenes/minutero.png"/>
+            <img id="hora" src="imagenes/horas.png"/>
+        </div>
+        </div>
+        <div data-role="footer" class="pie">
+            <p>Gracias por su preferencia</p>
+            <a href="#principal" class="ui-btn ui-icon-home ui-btn-icon-left">Nueva Orden</a>
+            <a href="http://facebook.com" class="ui-btn">Facebook</a>
+            <a href="http://twitter.com" class="ui-btn">Twitter</a>
+	</div>
+    </div>
+
+</body>
+</html>
